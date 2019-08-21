@@ -1,42 +1,150 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MazeSolver : MonoBehaviour
 {
     Stack<Vector3> Path;
-    List<Vector3> PositionsVisited;
-    public Vector3 Start;
-    public Vector3 Finish;
+    public bool[,] visited;
+    int NodeWidth = 4;
+    public Vector3 StartPos;
+    public Vector3 FinishPos;
+    private int curX;
+    private int curZ;
 
-    GameEvent MazeSolved;
+    public FloatReference mazeSize;
+    public GameEvent MazeSolved;
 
+    private void Start()
+    {
+    }
     public void SolveMaze()
     {
-        Vector3 approxPosition = new Vector3(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y), Mathf.RoundToInt(transform.position.z));
-        transform.position = approxPosition;
-        Path.Push(approxPosition);
-        PositionsVisited.Add(approxPosition);
+        FinishPos = new Vector3(mazeSize.Value*NodeWidth, 2.1f, mazeSize.Value*NodeWidth);
+        Path = new Stack<Vector3>();
 
-        if (Vector3.Distance(transform.position, Finish) < 1f)
+        curX = Mathf.RoundToInt(StartPos.x)/NodeWidth;
+        curZ = Mathf.RoundToInt(StartPos.z)/NodeWidth;
+
+        visited = new bool[Mathf.RoundToInt(mazeSize.Value), Mathf.RoundToInt(mazeSize.Value)];
+        for(int i = 0; i < Mathf.RoundToInt(mazeSize.Value); i++)
+        {
+            for(int j = 0; j < Mathf.RoundToInt(mazeSize.Value); j++)
+            {
+                visited[i,j] = false;
+            }
+        }
+        
+        SolveStep();
+    }
+    public void SolveStep()
+    {
+        if(CheckIfWeAreCloseEnough())
         {
             MazeSolved.Raise();
-            GenerateRoad();
+           // GenerateRoad();
         }
         else
         {
-            MoveToValidPosition();
+            // Save the current path we are on
+            Path.Push(transform.position);
+
+            curX = Mathf.RoundToInt(transform.position.x) / NodeWidth;
+            curZ = Mathf.RoundToInt(transform.position.z) / NodeWidth;
+            // Mark our current spot as explored
+            visited[curX, curZ] = true;
+
+            Debug.Log("curX: " + curX + "  curZ: " + curZ);
+            // if we cannot move to a valid location false is returned and we need to move back a spot.
+            if (!MoveToValidPosition())
+            {
+                Debug.Log("FailedToMove");
+                transform.position = Path.Pop();
+            }
+            else
+            {
+                Debug.Log("MoveSuccess");
+            }
+           //     
+            Invoke("SolveStep", .2f);
         }
+        
     }
-    private void MoveToValidPosition()
+
+
+    private bool CheckIfWeAreCloseEnough()
     {
-        // Check if there is a wall north, if there isnt then check if it has been visited, move to north
-        // Check if there if a wall east, if there isnt then check if it has been visited, move to east
-        // check if there is a wall south, if there isnt then check if it has been visited, move to south
-        // check if there is a wall west, if there isnt then check if it has been visited, move to west
+        return Vector3.Distance(transform.position, FinishPos) < 1f;
+    }
+    private bool MoveToValidPosition()
+    {
+        bool successfulMove = false;
+        RaycastHit hit;
+        LayerMask lm = ~0;
+        // Check North
+        if (Physics.Raycast(transform.position, Vector3.forward, out hit, 3f, lm) || curZ+1 >= Mathf.RoundToInt(mazeSize.Value) || visited[curX, curZ+1])
+        {
+            // if we hit a wall north, or north is off the charts, or north has been visited -- move on we cant move there
+        }
+        else
+        {
+            successfulMove = true;
+            curZ += 1;
+            transform.position += new Vector3(0, 0, NodeWidth);
+            return successfulMove;
+        }
+        
+        // Check East
+        if (Physics.Raycast(transform.position, Vector3.right, out hit, 3f, lm) || curX+1 >= Mathf.RoundToInt(mazeSize.Value) || visited[curX+1, curZ])
+        {
+        }
+        else
+        {
+            successfulMove = true;
+            curX += 1;
+            transform.position += new Vector3(NodeWidth, 0, 0);
+            return successfulMove;
+        }
+
+        // Check South
+        if (Physics.Raycast(transform.position, Vector3.forward * -1, out hit, 3f, lm) || curZ-1 < 0 || visited[curX, curZ-1])
+        {
+            // if we hit a wall north, or north is off the charts, or north has been visited -- move on
+        }
+        else
+        {
+            successfulMove = true;
+            curZ -= 1;
+            transform.position -= new Vector3(0, 0, NodeWidth);
+            return successfulMove;
+        }
+
+        // Check West
+        if (Physics.Raycast(transform.position, Vector3.right * -1, out hit, 3f, lm) || curX-1 < 0 || visited[curX-1, curZ])
+        {
+            // if we hit a wall north, or north is off the charts, or north has been visited -- move on
+        }
+        else
+        {
+            successfulMove = true;
+            curX -= 1;
+            transform.position -= new Vector3(NodeWidth, 0, 0);
+            return successfulMove;
+        }
+        
+        return successfulMove;
     }
     public void GenerateRoad()
     {
-        // Create tiles and waypoints at each position in path
+        /*
+        while(Path.Peek() != null)
+        {
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.transform.position = Path.Pop();
+        }
+        */
+    }
+    public void Reset()
+    {
+        transform.position = StartPos;
     }
 }

@@ -104,5 +104,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b893f0f8357deae42b9c06fc06157921, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeRate:
+    UseConstant: 0
+    ConstantValue: 0
+    Variable: {fileID: 11400000, guid: c8397a62d015caa4eb885480338cd139, type: 2}
   endY: 1.5
-  speed: 5
+  speed: 10

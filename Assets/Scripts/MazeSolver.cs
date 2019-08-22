@@ -11,6 +11,8 @@ public class MazeSolver : MonoBehaviour
     private int curX;
     private int curZ;
 
+    public FloatReference timeFactor;
+
     public FloatReference mazeSize;
     public GameEvent MazeSolved;
     public GameObject PathTile;
@@ -40,7 +42,6 @@ public class MazeSolver : MonoBehaviour
         if(CheckIfWeAreCloseEnough())
         {
             Path.Push(transform.position);
-            MazeSolved.Raise();
             CancelInvoke("SolveStep");
             GenerateRoad();
         }
@@ -60,7 +61,7 @@ public class MazeSolver : MonoBehaviour
                 Path.Pop();
                 transform.position = Path.Pop();
             }            
-            Invoke("SolveStep", .07f);
+            Invoke("SolveStep", .05f/timeFactor.Value);
         }
         
     }
@@ -131,12 +132,14 @@ public class MazeSolver : MonoBehaviour
     public void GenerateRoad()
     {
         if (Path.Count == 0)
-        { }
+        {
+            MazeSolved.Raise();
+        }
         else
         {
             GameObject go = Instantiate(PathTile, Path.Pop() + DropInHeight, Quaternion.identity);
             go.transform.parent = transform;
-            Invoke("GenerateRoad", .05f);
+            Invoke("GenerateRoad", .07f / (timeFactor.Value * 2));
         }
     }
     public void Reset()

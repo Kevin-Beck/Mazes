@@ -430,6 +430,10 @@ MonoBehaviour:
   visitedSphere: {fileID: 71675885933520801}
   marker: {fileID: 2276126230563761303}
   MazeGenComplete: {fileID: 11400000, guid: 454771836e74b9342b90ac3841d230b1, type: 2}
+  timeFactor:
+    UseConstant: 0
+    ConstantValue: 0
+    Variable: {fileID: 11400000, guid: c8397a62d015caa4eb885480338cd139, type: 2}
 --- !u!114 &-1481280097765981613
 MonoBehaviour:
   m_ObjectHideFlags: 0

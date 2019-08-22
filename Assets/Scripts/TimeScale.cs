@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TimeScale : MonoBehaviour
 {
+    public FloatReference RateOfTime;
+    
     public void PauseTime()
     {
         Time.timeScale = 0;
@@ -11,6 +13,6 @@ public class TimeScale : MonoBehaviour
 
     public void PlayTime()
     {
-        Time.timeScale = 1;
+        Time.timeScale = RateOfTime.Value;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DropIn : MonoBehaviour
 {
+    public FloatReference timeRate;
     public float endY;
     bool madeIt;
     Vector3 myTargetPosition;
@@ -18,11 +19,13 @@ public class DropIn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!madeIt)
+        if (!madeIt)
         {
-            transform.position = Vector3.Lerp(transform.position, myTargetPosition, speed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, myTargetPosition, speed * Time.deltaTime * timeRate );
             if (transform.position.y < endY + 0.01f)
                 madeIt = true;
         }
+        else
+            this.enabled = false;
     }
 }

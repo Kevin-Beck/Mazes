@@ -24,6 +24,7 @@ public class MazeNode : MonoBehaviour
     private bool checkedw = false;
 
     public GameEvent MazeGenComplete;
+    public FloatReference timeFactor;
 
     // Start is called before the first frame update
     void Awake()
@@ -91,7 +92,7 @@ public class MazeNode : MonoBehaviour
                 }
                // else
                //     Debug.Log("Didnt Hit Anything");
-                Invoke("EvaluateNeighbor", .01f);
+                Invoke("EvaluateNeighbor", .05f / timeFactor.Value);
             }
         }
         else

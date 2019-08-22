@@ -7,19 +7,18 @@ public class MazeSolver : MonoBehaviour
     public bool[,] visited;
     int NodeWidth = 4;
     public Vector3 StartPos;
-    public Vector3 FinishPos;
+    Vector3 FinishPos;
     private int curX;
     private int curZ;
 
     public FloatReference mazeSize;
     public GameEvent MazeSolved;
-
-    private void Start()
-    {
-    }
+    public GameObject PathTile;
+    public Vector3 DropInHeight;
+    
     public void SolveMaze()
     {
-        FinishPos = new Vector3(mazeSize.Value*NodeWidth, 2.1f, mazeSize.Value*NodeWidth);
+        FinishPos = new Vector3((mazeSize.Value-1)*NodeWidth, 2.1f, (mazeSize.Value-1)*NodeWidth);
         Path = new Stack<Vector3>();
 
         curX = Mathf.RoundToInt(StartPos.x)/NodeWidth;
@@ -40,8 +39,10 @@ public class MazeSolver : MonoBehaviour
     {
         if(CheckIfWeAreCloseEnough())
         {
+            Path.Push(transform.position);
             MazeSolved.Raise();
-           // GenerateRoad();
+            CancelInvoke("SolveStep");
+            GenerateRoad();
         }
         else
         {
@@ -53,19 +54,13 @@ public class MazeSolver : MonoBehaviour
             // Mark our current spot as explored
             visited[curX, curZ] = true;
 
-            Debug.Log("curX: " + curX + "  curZ: " + curZ);
             // if we cannot move to a valid location false is returned and we need to move back a spot.
             if (!MoveToValidPosition())
             {
-                Debug.Log("FailedToMove");
+                Path.Pop();
                 transform.position = Path.Pop();
-            }
-            else
-            {
-                Debug.Log("MoveSuccess");
-            }
-           //     
-            Invoke("SolveStep", .2f);
+            }            
+            Invoke("SolveStep", .07f);
         }
         
     }
@@ -135,16 +130,19 @@ public class MazeSolver : MonoBehaviour
     }
     public void GenerateRoad()
     {
-        /*
-        while(Path.Peek() != null)
+        if (Path.Count == 0)
+        { }
+        else
         {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.transform.position = Path.Pop();
+            GameObject go = Instantiate(PathTile, Path.Pop() + DropInHeight, Quaternion.identity);
+            go.transform.parent = transform;
+            Invoke("GenerateRoad", .05f);
         }
-        */
     }
     public void Reset()
     {
         transform.position = StartPos;
+        foreach (Transform child in transform)
+            Destroy(child.gameObject);
     }
 }

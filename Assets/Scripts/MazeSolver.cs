@@ -8,6 +8,7 @@ public class MazeSolver : MonoBehaviour
     int NodeWidth = 4;
     public Vector3 StartPos;
     Vector3 FinishPos;
+    public bool isSecondSolver;
     private int curX;
     private int curZ;
 
@@ -17,10 +18,20 @@ public class MazeSolver : MonoBehaviour
     public GameEvent MazeSolved;
     public GameObject PathTile;
     public Vector3 DropInHeight;
+
+    private int noWayCounter = 0;
     
     public void SolveMaze()
     {
-        FinishPos = new Vector3((mazeSize.Value-1)*NodeWidth, 2.1f, (mazeSize.Value-1)*NodeWidth);
+        if (isSecondSolver)
+        {
+            FinishPos = new Vector3(0, 2.1f, (mazeSize.Value - 1) * NodeWidth);
+            StartPos= new Vector3((mazeSize.Value - 1) * NodeWidth, 2.1f, 0);
+            transform.position = StartPos;
+        }
+        else
+            FinishPos = new Vector3((mazeSize.Value-1)*NodeWidth, 2.1f, (mazeSize.Value-1)*NodeWidth);
+
         Path = new Stack<Vector3>();
 
         curX = Mathf.RoundToInt(StartPos.x)/NodeWidth;
@@ -59,7 +70,12 @@ public class MazeSolver : MonoBehaviour
             if (!MoveToValidPosition())
             {
                 Path.Pop();
-                transform.position = Path.Pop();
+                if (noWayCounter > 3)
+                    Debug.Log("NoWayOut");
+                if (Path.Count == 0)
+                    noWayCounter++;
+                else
+                    transform.position = Path.Pop();
             }            
             Invoke("SolveStep", .05f/timeFactor.Value);
         }

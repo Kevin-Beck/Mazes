@@ -41,37 +41,40 @@ public class ClickAndDrag : MonoBehaviour
     }
     private void OnMouseDrag()
     {
-        if (firstFrame)
+        if (selected)
         {
-            lastFramePosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
-            firstFrame = false;
-        }
-        else
-        {
-            Vector2 mousePos = new Vector2();
-            Vector3 curFramePosition;
-            mousePos.x = Input.mousePosition.x;
-            mousePos.y = Input.mousePosition.y;
-            curFramePosition = cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, cam.nearClipPlane));
+            if (firstFrame)
+            {
+                lastFramePosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
+                firstFrame = false;
+            }
+            else
+            {
+                Vector2 mousePos = new Vector2();
+                Vector3 curFramePosition;
+                mousePos.x = Input.mousePosition.x;
+                mousePos.y = Input.mousePosition.y;
+                curFramePosition = cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, cam.nearClipPlane));
 
-            Vector3 screenDifferenceVector = curFramePosition - lastFramePosition;
+                Vector3 screenDifferenceVector = curFramePosition - lastFramePosition;
 
-            Vector3 moveVector = new Vector3();
-            if (xpos)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(1, 0, 0));
-            if (xneg)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(-1, 0, 0));
-            if (ypos)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 1, 0));
-            if (yneg)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, -1, 0));
-            if (zpos)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 0, 1));
-            if (zneg)
-                moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 0, -1));
+                Vector3 moveVector = new Vector3();
+                if (xpos)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(1, 0, 0));
+                if (xneg)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(-1, 0, 0));
+                if (ypos)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 1, 0));
+                if (yneg)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, -1, 0));
+                if (zpos)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 0, 1));
+                if (zneg)
+                    moveVector += Vector3.Project(screenDifferenceVector, new Vector3(0, 0, -1));
 
-            MoveMe(moveVector * 100);
-            lastFramePosition = curFramePosition;
+                MoveMe(moveVector * 100);
+                lastFramePosition = curFramePosition;
+            }
         }
     }
 
